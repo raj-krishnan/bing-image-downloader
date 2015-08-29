@@ -45,6 +45,7 @@ def main():
     SOURCE = "http://www.bing.com"
     STORAGE = "./images/"
     LOGFILE = ".logfile"
+    SET_WALLPAPER = "gsettings set org.gnome.desktop.background picture-uri file://$(\"pwd\")"
     mkdir_if_required = "if [ ! -d " + STORAGE + " ]; then\n    mkdir " + STORAGE + "\n    fi"
     os.system(mkdir_if_required)
 
@@ -60,7 +61,9 @@ def main():
                 if c != '\\':
                     last_retrieved_file_without_escape_sequences += c
             if date == last_retrieved_on and os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
-                print "You have the latest image. Exiting...\n"
+                print "You have the latest image."
+                os.system(SET_WALLPAPER + STORAGE[1:] + last_retrieved_file)
+                print "Reset that image as wallpaper. Exiting..."
                 return 0
 
     url = get_image_url(SOURCE)
@@ -75,5 +78,5 @@ def main():
 
     with open(LOGFILE, "a") as logfile:
         logfile.write(date + " " + date + "-" + name + "\n")
-
+    os.system(SET_WALLPAPER + STORAGE[1:] + date + "-" + name)
 main()

@@ -97,7 +97,7 @@ def main():
     if url == -1:
         print "Error obtaining the image URL"
         return -1
-
+    
     name = download_image(url)
     if name == -1:
         return -2

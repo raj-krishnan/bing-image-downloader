@@ -2,6 +2,12 @@ import urllib3
 import os
 from datetime import datetime
 
+SOURCE = "http://www.bing.com"
+STORAGE = "./images/"
+LOGFILE = ".logfile"
+SET_WALLPAPER = "gsettings set org.gnome.desktop.background picture-uri file://$(\"pwd\")"
+mkdir_if_required = "if [ ! -d " + STORAGE + " ]; then\n    mkdir " + STORAGE + "\n    fi"
+
 def get_image_url(baseUrl):
     http = urllib3.PoolManager()
     req = http.request('GET', baseUrl)
@@ -41,14 +47,7 @@ def get_image_name(url):
 
     return (default_name, name)
 
-def main():
-    SOURCE = "http://www.bing.com"
-    STORAGE = "./images/"
-    LOGFILE = ".logfile"
-    SET_WALLPAPER = "gsettings set org.gnome.desktop.background picture-uri file://$(\"pwd\")"
-    mkdir_if_required = "if [ ! -d " + STORAGE + " ]; then\n    mkdir " + STORAGE + "\n    fi"
-    os.system(mkdir_if_required)
-
+def check_existing_image():
     date = datetime.now().strftime("%Y%m%d")
 
     if os.path.isfile(LOGFILE):
@@ -65,18 +64,44 @@ def main():
                 os.system(SET_WALLPAPER + STORAGE[1:] + last_retrieved_file)
                 print "Reset that image as wallpaper. Exiting..."
                 return 0
+            elif os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
+                os.system("rm -f " + STORAGE + last_retrieved_file_without_escape_sequences)
+
+            return 1
+
+def download_image(url):
+    try:
+        default_name, name = get_image_name(url)
+        date = datetime.now().strftime("%Y%m%d")
+        os.system("wget " + url)
+        os.system("mv " + default_name + " " + STORAGE + date + "-" + name)
+
+        with open(LOGFILE, "a") as logfile:
+            logfile.write(date + " " + date + "-" + name + "\n")
+        return name
+    except:
+        print "Error. Exiting..."
+        return -1
+
+def set_wallpaper(name):
+    date = datetime.now().strftime("%Y%m%d")
+    os.system(SET_WALLPAPER + STORAGE[1:] + date + "-" + name)
+
+def main():
+    os.system(mkdir_if_required)
+
+    if check_existing_image() == 0:
+        return 0
 
     url = get_image_url(SOURCE)
-
     if url == -1:
         print "Error obtaining the image URL"
         return -1
-    default_name, name = get_image_name(url)
 
-    os.system("wget " + url)
-    os.system("mv " + default_name + " " + STORAGE + date + "-" + name)
+    name = download_image(url)
+    if name == -1:
+        return -2
 
-    with open(LOGFILE, "a") as logfile:
-        logfile.write(date + " " + date + "-" + name + "\n")
-    os.system(SET_WALLPAPER + STORAGE[1:] + date + "-" + name)
+    set_wallpaper(name)
+
 main()

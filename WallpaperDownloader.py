@@ -97,10 +97,18 @@ def main():
     if url == -1:
         print "Error obtaining the image URL"
         return -1
-    
+
     name = download_image(url)
     if name == -1:
         return -2
+
+    date = datetime.now().strftime("%Y%m%d")
+    os.system("eog %s", (STORAGE + date + "-" + name))
+
+    choice = raw_input("Set image as wallpaper (Y/n): ")[0].lower()
+
+    if choice == 'n':
+        return
 
     set_wallpaper(name)
 

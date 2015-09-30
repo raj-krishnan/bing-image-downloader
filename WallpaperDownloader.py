@@ -60,10 +60,10 @@ def check_existing_image():
                 if c != '\\':
                     last_retrieved_file_without_escape_sequences += c
             if date == last_retrieved_on and os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
-                print "You have the latest image."
-                os.system(SET_WALLPAPER + STORAGE[1:] + last_retrieved_file)
+                print "You have the latest image downloaded"
+                # os.system(SET_WALLPAPER + STORAGE[1:] + last_retrieved_file)
                 print "Reset that image as wallpaper. Exiting..."
-                return 0
+                return last_retrieved_file
             elif os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
                 os.system("rm -f " + STORAGE + last_retrieved_file_without_escape_sequences)
 
@@ -89,27 +89,32 @@ def set_wallpaper(name):
 
 def main():
     os.system(mkdir_if_required)
+    nm = ''
+    existing_image = check_existing_image()
 
-    if check_existing_image() == 0:
-        return 0
+    if existing_image == 1:
+        url = get_image_url(SOURCE)
+        if url == -1:
+            print "Error obtaining the image URL"
+            return -1
 
-    url = get_image_url(SOURCE)
-    if url == -1:
-        print "Error obtaining the image URL"
-        return -1
+        name = download_image(url)
+        if name == -1:
+            return -2
 
-    name = download_image(url)
-    if name == -1:
-        return -2
+        nm = name
 
     date = datetime.now().strftime("%Y%m%d")
-    os.system("eog %s", (STORAGE + date + "-" + name))
+    os.system("eog " + STORAGE + existing_image)
+
 
     choice = raw_input("Set image as wallpaper (Y/n): ")[0].lower()
 
     if choice == 'n':
         return
-
-    set_wallpaper(name)
+    elif existing_image == 1:
+        set_wallpaper(nm)
+    else:
+        os.system(SET_WALLPAPER + STORAGE[1:] + existing_image)
 
 main()

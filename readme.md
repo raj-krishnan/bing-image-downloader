@@ -9,5 +9,4 @@ Presently, this works only with GNOME-Shell.
 
 To do:
 
-- Get user's confirmation before changing wallpaper
 - Run this on booting up and/or every X hours as decided by the user

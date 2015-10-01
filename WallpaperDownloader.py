@@ -91,6 +91,7 @@ def main():
     os.system(mkdir_if_required)
     nm = ''
     existing_image = check_existing_image()
+    date = datetime.now().strftime("%Y%m%d")
 
     if existing_image == 1:
         url = get_image_url(SOURCE)
@@ -98,14 +99,13 @@ def main():
             print "Error obtaining the image URL"
             return -1
 
-        name = download_image(url)
-        if name == -1:
+        nm = download_image(url)
+        if nm == -1:
             return -2
 
-        nm = name
-
-    date = datetime.now().strftime("%Y%m%d")
-    os.system("eog " + STORAGE + existing_image)
+        os.system("eog " + STORAGE + date + "-" + nm)
+    else:
+        os.system("eog " + STORAGE + existing_image)
 
 
     choice = raw_input("Set image as wallpaper (Y/n): ")[0].lower()

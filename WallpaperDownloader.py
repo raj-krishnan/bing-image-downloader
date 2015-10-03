@@ -62,7 +62,7 @@ def check_existing_image():
             if date == last_retrieved_on and os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
                 print "You have the latest image downloaded"
                 # os.system(SET_WALLPAPER + STORAGE[1:] + last_retrieved_file)
-                print "Reset that image as wallpaper. Exiting..."
+                # print "Reset that image as wallpaper. Exiting..."
                 return last_retrieved_file
             elif os.path.exists(STORAGE + last_retrieved_file_without_escape_sequences):
                 os.system("rm -f " + STORAGE + last_retrieved_file_without_escape_sequences)

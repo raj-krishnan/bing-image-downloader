@@ -9,4 +9,5 @@ Presently, this works only with GNOME-Shell.
 
 To do:
 
-- Run this on booting up and/or every X hours as decided by the user
+ - Add a setup script
+
